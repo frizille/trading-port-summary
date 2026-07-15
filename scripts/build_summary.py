@@ -71,6 +71,10 @@ def load(csv_path):
     with open(csv_path, "r", encoding="utf-8-sig") as f:
         text = f.read()
     rows = list(csv.DictReader(io.StringIO(text)))
+    # Normalize headers to be case-insensitive (Fidelity varies capitalization)
+    def _ci(row):
+        return { (k or "").strip().lower(): v for k, v in row.items() }
+    rows = [_ci(r) for r in rows]
     equities = {}          # ticker -> [shares, market_value, cost]
     crypto = {}            # ticker -> [qty, market_value, cost]
     options = []           # list of dicts
@@ -78,14 +82,14 @@ def load(csv_path):
     net_option_value = 0.0
 
     for r in rows:
-        sym = (r.get("Symbol") or "").strip()
-        acct = (r.get("Account Name") or "").strip()
+        sym = (r.get("symbol") or "").strip()
+        acct = (r.get("account name") or "").strip()
         if not sym:
             continue
-        desc = r.get("Description") or ""
-        val = clean_num(r.get("Current Value")) or 0.0
-        qty = clean_num(r.get("Quantity"))
-        cost = clean_num(r.get("Cost Basis Total")) or 0.0
+        desc = r.get("description") or ""
+        val = clean_num(r.get("current value")) or 0.0
+        qty = clean_num(r.get("quantity"))
+        cost = clean_num(r.get("cost basis total")) or 0.0
 
         # Cash / money-market / pending
         if is_money_market(sym, desc) or sym.lower().startswith("pending"):

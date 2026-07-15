@@ -51,6 +51,9 @@ Outputs `portfolio-summary-<date>.html` and `.md` to `--outdir`.
   Long/Short by quantity.
 - **% of port** = position market value ÷ total account value
   (equities + crypto + cash + net option value).
+- **Column headers are matched case-insensitively.** Fidelity's export has
+  varied the capitalization of its headers over time (e.g. `Current Value` vs
+  `Current value`); the script normalizes them so either form parses correctly.
 
 ## Caveat: the Options "Note" column is heuristic
 
@@ -63,6 +66,14 @@ these before sharing.**
 
 This skill *summarizes* holdings. It does not value, rate, or recommend
 positions, and adds no price targets or projections.
+
+## Changelog
+
+- **2026-07-15** — Fixed CSV parsing to match column headers
+  case-insensitively. A Fidelity export using lowercase headers (e.g.
+  `Current value`) previously caused every market value to read as `$0`;
+  headers are now normalized before lookup. Backward-compatible with
+  title-case exports.
 
 ## License
 
